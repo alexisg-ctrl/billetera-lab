@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Billetera Lab</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #101827;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    main {
+      max-width: 420px;
+      margin: 30px auto;
+    }
+    .card {
+      background: #1d2b42;
+      padding: 22px;
+      border-radius: 18px;
+      margin: 16px 0;
+    }
+    .label { color: #b8c6dc; }
+    .saldo { font-size: 32px; font-weight: bold; }
+    button {
+      padding: 12px;
+      width: 100%;
+      margin-top: 10px;
+      border: 0;
+      border-radius: 9px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    input {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #8091aa;
+    }
+    .aviso { color: #ffd479; }
+  </style>
+</head>
+<body>
+<main>
+  <h1> Billetera Lab </h1>
+  <p class="label">Laboratorio educativo · Dinero ficticio</p>
+
+  <section class="card">
+    <p class="label">Saldo visual editable</p>
+    <div class="saldo" id="visual">Bs 100.00</div>
+    <input id="nuevoSaldo" type="number"
+      min="0" step="0.01" placeholder="Nuevo saldo visual">
+    <button id="cambiar">Cambiar saldo visual</button>
+  </section>
+
+  <section class="card">
+    <p class="label">Saldo del servidor simulado</p>
+    <div class="saldo" id="servidor">Bs 100.00</div>
+    <p id="estado">Esperando operación.</p>
+    <input id="compra" type="number"
+      min="0.01" step="0.01" placeholder="Importe de compra ficticia">
+    <button id="comprar">Validar compra ficticia</button>
+  </section>
+
+  <p class="aviso">
+    Este laboratorio no utiliza dinero real.
+    El servidor es una simulación local, no una API segura.
+  </p>
+</main>
+
+<script>
+  let saldoVisual = 100;
+  let saldoSimulado = 100;
+
+  const formato = n =>
+    "Bs " + n.toLocaleString("es-BO", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+  function mostrar() {
+    document.getElementById("visual").textContent =
+      formato(saldoVisual);
+    document.getElementById("servidor").textContent =
+      formato(saldoSimulado);
+  }
+
+  document.getElementById("cambiar").onclick = () => {
+    const valor = document.getElementById("nuevoSaldo").value;
+
+    if (valor.trim() === "" ||
+        !Number.isFinite(Number(valor)) ||
+        Number(valor) < 0) {
+      alert("Introduce un saldo visual válido.");
+      return;
+    }
+
+    saldoVisual = Number(valor);
+    mostrar();
+    document.getElementById("estado").textContent =
+      "Cambiaste la pantalla, no el saldo simulado.";
+  };
+
+  document.getElementById("comprar").onclick = () => {
+    const campo = document.getElementById("compra");
+    const importe = Number(campo.value);
+
+    if (campo.value.trim() === "" ||
+        !Number.isFinite(importe) || importe <= 0) {
+      alert("Introduce un importe válido.");
+      return;
+    }
+
+    if (importe > saldoSimulado) {
+      document.getElementById("estado").textContent =
+        "Compra rechazada: saldo simulado insuficiente.";
+      return;
+    }
+
+    saldoSimulado =
+      Math.round((saldoSimulado - importe) * 100) / 100;
+
+    document.getElementById("estado").textContent =
+      "Compra ficticia aprobada en la simulación.";
+    mostrar();
+    campo.value = "";
+  };
+
+  mostrar();
+</script>
+</body>
+</html>
